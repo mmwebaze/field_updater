@@ -1,0 +1,4 @@
+services:
+  field_updater:
+    class: Drupal\field_updater\Service\FieldUpdaterService
+    arguments: ['@database', '@entity_type.manager']

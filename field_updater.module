@@ -70,13 +70,16 @@ function field_updater_field_storage_config_edit_form(array  $form, FormStateInt
     $entity = $form_object->getEntity();
     $config = \Drupal::configFactory();
     $data = $config->getEditable('field.storage.'.$entity->id())->getRawData();
+
     $entity_type = $data['entity_type'];
     $field_name = $data['field_name'];
 
     $settings = ['precision' => $form_state->getValue('precison'), 'scale' => $form_state->getValue('scale')] ;
     $tables = ["{$entity_type}_revision__{$field_name}", "{$entity_type}__{$field_name}"];
-    $fieldUpdaterService = new \Drupal\field_updater\Service\FieldUpdaterService();
+
+    $fieldUpdaterService = Drupal::service('field_updater');//new \Drupal\field_updater\Service\FieldUpdaterService();
     $fieldUpdaterService->fieldUpdater($tables, $field_name, 'decimal', $settings);
+
     drupal_set_message('Successfully converted from integer to decimal');
   }
 }
