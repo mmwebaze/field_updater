@@ -18,17 +18,15 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
   }
 
   public function fieldUpdater($tables, $field, $type, $settings){
-    //print_r($tables);die();
     $database = $this->connection;
-    $existing_data = [];
+    $existingData = [];
     foreach ($tables as $table) {
-      // Get the old data.
-      $existing_data[$table] = $database->select($table)
+
+      $existingData[$table] = $database->select($table)
         ->fields($table)
         ->execute()
         ->fetchAll(\PDO::FETCH_ASSOC);
 
-      // Wipe it.
       $database->truncate($table)->execute();
     }
 
@@ -37,7 +35,7 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
       ->loadByProperties([
         'field_name' => $field,
       ]);
-    //print_r($field_storage_configs);print('>>>>>');
+
     $field_storage = FieldStorageConfig::loadByName('node', $field);
 
     $new_fields = array();
@@ -53,12 +51,10 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
       // Delete field.
       $field->delete();
     }
-   //print_r($fieldConfig);die('df');
 
     foreach ($field_storage_configs as $field_storage) {
 
       $new_field_storage = $field_storage->toArray();
-      //print_r($new_field_storage);die();
       $new_field_storage['type'] = $type;
       $new_field_storage['settings'] = $settings;
 
@@ -69,14 +65,8 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
       $new_field_storage->save();
       $this->entityTypeManager->clearCachedDefinitions();
     }
-    /*$new_field_storage = $field_storage->toArray();
-    $new_field_storage['type'] = $type;
-    $new_field_storage['settings'] = $settings;*/
-    field_purge_batch(250);
-    /*$new_field_storage = FieldStorageConfig::create($new_field_storage);
-    $new_field_storage->original = $new_field_storage;
-    //$new_field_storage->enforceIsNew(FALSE);
-    $new_field_storage->save()*/;
+
+    //field_purge_batch(250);
 
     foreach ($new_fields as $new_field) {
       $new_field = FieldConfig::create($new_field);
@@ -87,8 +77,8 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
     foreach ($tables as $table) {
       $insert_query = $database
         ->insert($table)
-        ->fields(array_keys(end($existing_data[$table])));
-      foreach ($existing_data[$table] as $row) {
+        ->fields(array_keys(end($existingData[$table])));
+      foreach ($existingData[$table] as $row) {
         $insert_query->values(array_values($row));
       }
       $insert_query->execute();

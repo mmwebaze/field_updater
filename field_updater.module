@@ -1,18 +1,18 @@
 <?php
 use \Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityForm;
-use \Drupal\field\FieldStorageConfigInterface;
+
 /**
  * Implements hook_form_alter().
  */
 function field_updater_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $form_object = $form_state->getFormObject();
+
   if ($form_object instanceof EntityForm && $form_id == 'field_storage_config_edit_form') {
     $entity = $form_object->getEntity();
     $hasData = $entity->hasData();
 
     $fieldType = $entity->getType();
-   // print_r('Has storage: '.$hasData.' type: '.$fieldType.' id: '.$entity->id().' >>');
 
     if ($fieldType == 'integer' && $hasData){
 
@@ -77,7 +77,7 @@ function field_updater_field_storage_config_edit_form(array  $form, FormStateInt
     $settings = ['precision' => $form_state->getValue('precison'), 'scale' => $form_state->getValue('scale')] ;
     $tables = ["{$entity_type}_revision__{$field_name}", "{$entity_type}__{$field_name}"];
 
-    $fieldUpdaterService = Drupal::service('field_updater');//new \Drupal\field_updater\Service\FieldUpdaterService();
+    $fieldUpdaterService = Drupal::service('field_updater');
     $fieldUpdaterService->fieldUpdater($tables, $field_name, 'decimal', $settings);
 
     drupal_set_message('Successfully converted from integer to decimal');
