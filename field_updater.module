@@ -1,6 +1,7 @@
 <?php
-use \Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\field_updater\Util\EntityFromUri;
 
 /**
  * Implements hook_form_alter().
@@ -11,6 +12,7 @@ function field_updater_form_alter(&$form, FormStateInterface $form_state, $form_
   if ($form_object instanceof EntityForm && $form_id == 'field_storage_config_edit_form') {
     $entity = $form_object->getEntity();
     $hasData = $entity->hasData();
+
 
     $fieldType = $entity->getType();
 
@@ -31,6 +33,12 @@ function field_updater_form_alter(&$form, FormStateInterface $form_state, $form_
         '#type' => 'fieldset',
         '#title' => 'Precison settings for conversion from Integer to decimal.',
       );
+
+      $form['field_updater_settings']['content_type'] = array(
+        '#type' => 'hidden',
+        '#value' => EntityFromUri::currentUriEntity(),
+      );
+
       $form['field_updater_settings']['convert'] = array(
         '#type' => 'checkbox',
         '#title' => t('Enable integer to decimal conversion'),
@@ -78,7 +86,7 @@ function field_updater_field_storage_config_edit_form(array  $form, FormStateInt
     $tables = ["{$entity_type}_revision__{$field_name}", "{$entity_type}__{$field_name}"];
 
     $fieldUpdaterService = Drupal::service('field_updater');
-    $fieldUpdaterService->fieldUpdater($tables, $field_name, 'decimal', $settings);
+    $fieldUpdaterService->fieldUpdater($tables, $field_name, 'decimal', $settings, $form_state->getValue('content_type'));
 
     drupal_set_message('Successfully converted from integer to decimal');
   }

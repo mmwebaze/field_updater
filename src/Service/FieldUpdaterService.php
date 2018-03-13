@@ -17,7 +17,7 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
     $this->entityTypeManager = $entityTypeManager;
   }
 
-  public function fieldUpdater($tables, $field, $type, $settings){
+  public function fieldUpdater($tables, $field, $type, $settings, $bundle){
     $database = $this->connection;
     $existingData = [];
     foreach ($tables as $table) {
@@ -36,21 +36,17 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
         'field_name' => $field,
       ]);
 
-    $field_storage = FieldStorageConfig::loadByName('node', $field);
-
     $new_fields = array();
-    foreach ($field_storage->getBundles() as $bundle => $label) {
 
-      $field = FieldConfig::loadByName('node', $bundle, $field);
+    $field = FieldConfig::loadByName('node', $bundle, $field);
+    $field->set('settings', $settings);
+    $new_field = $field->toArray();
 
-      $new_field = $field->toArray();
-
-      $new_field['field_type'] = $type;
-      $new_field['settings'] = $settings;
-      $new_fields[] = $new_field;
-      // Delete field.
-      $field->delete();
-    }
+    $new_field['field_type'] = $type;
+    $new_field['settings'] = $settings;
+    $new_fields[] = $new_field;
+    // Delete field.
+    $field->delete();
 
     foreach ($field_storage_configs as $field_storage) {
 
@@ -66,12 +62,8 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
       $this->entityTypeManager->clearCachedDefinitions();
     }
 
-    //field_purge_batch(250);
-
-    foreach ($new_fields as $new_field) {
-      $new_field = FieldConfig::create($new_field);
-      $new_field->save();
-    }
+    $new_field = FieldConfig::create($new_field);
+    $new_field->save();
 
     // Restore the data.
     foreach ($tables as $table) {
