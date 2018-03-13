@@ -36,12 +36,12 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
         'field_name' => $field,
       ]);
 
-    $field = FieldConfig::loadByName('node', $bundle, $field);
-    $new_field = $field->toArray();
+    $fieldConfig = FieldConfig::loadByName('node', $bundle, $field);
+    $new_field = $fieldConfig->toArray();
 
     $new_field['field_type'] = $type;
     $new_field['settings'] = $settings;
-    $field->delete();
+    $fieldConfig->delete();
 
     foreach ($field_storage_configs as $field_storage) {
 
@@ -69,5 +69,11 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
       }
       $insert_query->execute();
     }
+
+    \Drupal::entityTypeManager()
+      ->getStorage('entity_form_display')
+      ->load('node' . '.' . $bundle . '.' . 'default')
+      ->setComponent($field, ['region' => 'content'])->save();
+    $this->entityTypeManager->clearCachedDefinitions();
   }
 }
