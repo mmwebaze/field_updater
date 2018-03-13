@@ -36,16 +36,11 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
         'field_name' => $field,
       ]);
 
-    $new_fields = array();
-
     $field = FieldConfig::loadByName('node', $bundle, $field);
-    $field->set('settings', $settings);
     $new_field = $field->toArray();
 
     $new_field['field_type'] = $type;
     $new_field['settings'] = $settings;
-    $new_fields[] = $new_field;
-    // Delete field.
     $field->delete();
 
     foreach ($field_storage_configs as $field_storage) {
@@ -56,7 +51,6 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
 
       $new_field_storage = FieldStorageConfig::create($new_field_storage);
       $new_field_storage->original = $new_field_storage;
-      //$new_field_storage->enforceIsNew(FALSE);
 
       $new_field_storage->save();
       $this->entityTypeManager->clearCachedDefinitions();
