@@ -70,10 +70,13 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
       $insert_query->execute();
     }
 
-    \Drupal::entityTypeManager()
-      ->getStorage('entity_form_display')
+    $this->entityTypeManager->getStorage('entity_form_display')
       ->load('node' . '.' . $bundle . '.' . 'default')
       ->setComponent($field, ['region' => 'content'])->save();
+    $this->entityTypeManager->getStorage('entity_view_display')
+      ->load('node' . '.' . $bundle . '.' . 'default')
+      ->setComponent($field, ['region' => 'content'])->save();
+
     $this->entityTypeManager->clearCachedDefinitions();
   }
 }
