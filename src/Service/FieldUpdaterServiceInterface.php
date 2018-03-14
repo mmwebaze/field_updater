@@ -6,7 +6,8 @@ namespace Drupal\field_updater\Service;
  * provides an interface for Field Updater services.
  *
  */
-interface FieldUpdaterServiceInterface {
+interface FieldUpdaterServiceInterface
+{
 
   /**
    * @param array $tables
@@ -26,5 +27,5 @@ interface FieldUpdaterServiceInterface {
    *
    * @return mixed
    */
-  public function fieldUpdater($tables, $field, $type, $settings, $bundle);
+    public function fieldUpdater($tables, $field, $type, $settings, $bundle);
 }

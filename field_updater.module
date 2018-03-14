@@ -1,4 +1,5 @@
 <?php
+
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\field_updater\Util\EntityFromUri;
@@ -16,74 +17,82 @@ function field_updater_form_alter(&$form, FormStateInterface $form_state, $form_
 
     $fieldType = $entity->getType();
 
-    if ($fieldType == 'integer' && $hasData){
+    if ($fieldType == 'integer' && $hasData) {
 
-      $precisionNumbers = range(10,32);
-      $precision = array();
-      foreach ($precisionNumbers as $precisionNumber){
-        $precision[$precisionNumber] = t((string)$precisionNumber);
+      $precisionNumbers = range(10, 32);
+      $precision = [];
+      foreach ($precisionNumbers as $precisionNumber) {
+        $precision[$precisionNumber] = t((string) $precisionNumber);
       }
       $scaleNumbers = range(0, 10);
-      $scale = array();
-      foreach ($scaleNumbers as $scaleNumber){
-        $scale[$scaleNumber] = t((string)$scaleNumber);
+      $scale = [];
+      foreach ($scaleNumbers as $scaleNumber) {
+        $scale[$scaleNumber] = t((string) $scaleNumber);
       }
 
-      $form['field_updater_settings'] = array(
+      $form['field_updater_settings'] = [
         '#type' => 'fieldset',
         '#title' => 'Precison settings for conversion from Integer to decimal.',
-      );
+      ];
 
-      $form['field_updater_settings']['content_type'] = array(
+      $form['field_updater_settings']['content_type'] = [
         '#type' => 'hidden',
         '#value' => EntityFromUri::currentUriEntity(),
-      );
+      ];
 
-      $form['field_updater_settings']['convert'] = array(
+      $form['field_updater_settings']['convert'] = [
         '#type' => 'checkbox',
         '#title' => t('Enable integer to decimal conversion'),
-      );
+      ];
       $form['field_updater_settings']['precison'] = [
         '#type' => 'select',
         '#title' => t('Precison'),
         '#options' => $precision,
-        '#states' => array(
-          'visible' => array(
-            ':input[name="convert"]' => array('checked' => TRUE),
-          ),
-        ),
+        '#states' => [
+          'visible' => [
+            ':input[name="convert"]' => ['checked' => TRUE],
+          ],
+        ],
       ];
       $form['field_updater_settings']['scale'] = [
         '#type' => 'select',
         '#title' => t('Scale'),
         '#options' => $scale,
-        '#states' => array(
-          'visible' => array(
-            ':input[name="convert"]' => array('checked' => TRUE),
-          ),
-        ),
+        '#states' => [
+          'visible' => [
+            ':input[name="convert"]' => ['checked' => TRUE],
+          ],
+        ],
       ];
       $form['actions']['submit']['#submit'][] = 'field_updater_field_storage_config_edit_form';
     }
   }
 }
+
 /**
  * Implements hook_form_submit().
  */
-function field_updater_field_storage_config_edit_form(array  $form, FormStateInterface $form_state){
+function field_updater_field_storage_config_edit_form(array $form, FormStateInterface $form_state) {
 
-  if ($form_state->getValue('convert')){
+  if ($form_state->getValue('convert')) {
 
     $form_object = $form_state->getFormObject();
     $entity = $form_object->getEntity();
     $config = \Drupal::configFactory();
-    $data = $config->getEditable('field.storage.'.$entity->id())->getRawData();
+    $data = $config->getEditable('field.storage.' . $entity->id())
+      ->getRawData();
 
     $entity_type = $data['entity_type'];
     $field_name = $data['field_name'];
 
-    $settings = ['precision' => $form_state->getValue('precison'), 'scale' => $form_state->getValue('scale')] ;
-    $tables = ["{$entity_type}_revision__{$field_name}", "{$entity_type}__{$field_name}"];
+    $settings = [
+      'precision' => $form_state->getValue('precison'),
+      'scale' => $form_state->getValue('scale'),
+    ];
+    $tables = [
+      "{$entity_type}_revision__{$field_name}",
+      "{$entity_type}__{$field_name}",
+    ];
 
     $fieldUpdaterService = Drupal::service('field_updater');
     $fieldUpdaterService->fieldUpdater($tables, $field_name, 'decimal', $settings, $form_state->getValue('content_type'));

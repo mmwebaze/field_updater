@@ -7,13 +7,14 @@ namespace Drupal\field_updater\Util;
  *
  * @package Drupal\field_updater\Util
  */
-class EntityFromUri {
-
+class EntityFromUri
+{
   /**
    * @return string id of the bundle or content type
    */
-  public static function currentUriEntity(){
-    $currentUri = \Drupal::request()->getRequestUri();
-    return explode('/', $currentUri)[5];
-  }
+    public static function currentUriEntity()
+    {
+        $currentUri = \Drupal::request()->getRequestUri();
+        return explode('/', $currentUri)[5];
+    }
 }
