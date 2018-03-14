@@ -8,15 +8,38 @@ use Drupal\field\Entity\FieldStorageConfig;
 use \Drupal\Core\Entity\EntityTypeManagerInterface;
 use \Drupal\Core\Database\Connection;
 
+/**
+ * FieldUpdaterService manages the conversion of one field type to another.
+ *
+ *
+ * @package Drupal\field_updater\Service
+ */
 class FieldUpdaterService implements FieldUpdaterServiceInterface{
-  private $entityTypeManager;
-  private $connection;
 
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
+   * FieldUpdaterService constructor.
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   */
   public function __construct(Connection $connection, EntityTypeManagerInterface $entityTypeManager) {
     $this->connection = $connection;
     $this->entityTypeManager = $entityTypeManager;
   }
-
+  /**
+   * {@inheritdoc}
+   *
+   */
   public function fieldUpdater($tables, $field, $type, $settings, $bundle){
     $database = $this->connection;
     $existingData = [];
@@ -53,7 +76,6 @@ class FieldUpdaterService implements FieldUpdaterServiceInterface{
       $new_field_storage->original = $new_field_storage;
 
       $new_field_storage->save();
-      $this->entityTypeManager->clearCachedDefinitions();
     }
 
     $new_field = FieldConfig::create($new_field);

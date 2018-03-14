@@ -8,7 +8,7 @@ use Drupal\field_updater\Util\EntityFromUri;
  */
 function field_updater_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $form_object = $form_state->getFormObject();
-//print_r(json_encode($form_object->getEntity()->toArray()));die();
+
   if ($form_object instanceof EntityForm && $form_id == 'field_storage_config_edit_form') {
     $entity = $form_object->getEntity();
     $hasData = $entity->hasData();
