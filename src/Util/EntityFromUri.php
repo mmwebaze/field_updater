@@ -17,4 +17,12 @@ class EntityFromUri
         $currentUri = \Drupal::request()->getRequestUri();
         return explode('/', $currentUri)[5];
     }
+  /**
+   * @return string field name being updated from integer to decimal
+   */
+    public static function currentUriField(){
+      $currentUri = \Drupal::request()->getRequestUri();
+
+      return explode('.', explode('/', $currentUri)[7])[2];
+  }
 }

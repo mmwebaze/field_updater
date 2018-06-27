@@ -10,22 +10,21 @@ interface FieldUpdaterServiceInterface
 {
 
   /**
-   * @param array $tables
-   * An array containing the tables associated to the field
    *
    * @param string $field
    * Machine name of the field
    *
    * @param string $type
-   * Field type such integer, decimal
-   *
-   * @param array $settings
-   * An array of key value pairs associated with the field
+   * Field type such as integer, decimal
    *
    * @param string $bundle
    * The bundle to which the converted field is associated with
    *
+   * @param integer $precision precision associated with decimal field type
+   *
+   *@param integer $scale scale associated with decimal field type
+   *
    * @return mixed
    */
-    public function fieldUpdater($tables, $field, $type, $settings, $bundle);
+    public function fieldUpdater($field, $type, $bundle, $precision, $scale);
 }
